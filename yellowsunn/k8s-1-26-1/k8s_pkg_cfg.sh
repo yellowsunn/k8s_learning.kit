@@ -8,6 +8,11 @@ yum install git -y
 # install docker 
 yum install docker-ce-$2 docker-ce-cli-$2 containerd.io-$3 -y
 
+# fix - [ERROR CRI]: container runtime is not running
+# disabled_plugins cri 주석 처리
+sed -i '/"cri"/ s/^/#/' /etc/containerd/config.toml
+systemctl restart containerd
+
 # install kubernetes
 # both kubelet and kubectl will install by dependency
 # but aim to latest version. so fixed version by manually
