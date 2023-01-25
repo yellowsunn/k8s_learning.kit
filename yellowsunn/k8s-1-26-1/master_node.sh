@@ -10,7 +10,7 @@ cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
 chown $(id -u):$(id -g) $HOME/.kube/config
 
 # raw_address for gitcontent
-raw_git="raw.githubusercontent.com/yellowsunn/IaC/master/yellowsunn/manifests" 
+raw_git="raw.githubusercontent.com/yellowsunn/IaC/master/yellowsunn/manifests"
 
 # config for kubernetes's network 
 kubectl apply -f https://$raw_git/172.16_net_calico_v3.25.0.yaml
@@ -23,6 +23,22 @@ kubectl apply -f https://$raw_git/metallb-l2config.yaml
 
 # create secret for metallb 
 kubectl create secret generic -n metallb-system memberlist --from-literal=secretkey="$(openssl rand -base64 128)"
+
+# install helm
+curl -fsSL -o get_helm.sh https://raw.githubusercontent.com/helm/helm/release-3.11/scripts/get-helm-3
+chmod 700 get_helm.sh
+./get_helm.sh
+rm -f get_helm.sh
+
+# install metrics-server:3.8.3 by helm
+helm repo add metrics-server https://kubernetes-sigs.github.io/metrics-server/
+helm repo update
+helm install metrics-server metrics-server/metrics-server \
+    --create-namespace \
+    --namespace=kube-system \
+    --set hostNetwork.enabled=true \
+    --set args={--kubelet-insecure-tls} \
+    --version 3.8.3
 
 # install bash-completion for kubectl 
 yum install bash-completion -y 
