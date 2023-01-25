@@ -11,6 +11,7 @@ chown $(id -u):$(id -g) $HOME/.kube/config
 
 # raw_address for gitcontent
 raw_git="raw.githubusercontent.com/yellowsunn/IaC/master/yellowsunn/manifests"
+bin_path="/usr/local/bin"
 
 # config for kubernetes's network 
 kubectl apply -f https://$raw_git/172.16_net_calico_v3.25.0.yaml
@@ -25,15 +26,14 @@ kubectl apply -f https://$raw_git/metallb-l2config.yaml
 kubectl create secret generic -n metallb-system memberlist --from-literal=secretkey="$(openssl rand -base64 128)"
 
 # install helm
-curl -fsSL -o get_helm.sh https://raw.githubusercontent.com/helm/helm/release-3.11/scripts/get-helm-3
-chmod 700 get_helm.sh
-./get_helm.sh
-rm -f get_helm.sh
+curl -0L https://get.helm.sh/helm-v3.11.0-linux-amd64.tar.gz > helm-v3.11.0-linux-amd64.tar.gz
+tar xvfz helm-v3.11.0-linux-amd64.tar.gz
+mv linux-amd64/helm $bin_path/.
 
 # install metrics-server:3.8.3 by helm
-helm repo add metrics-server https://kubernetes-sigs.github.io/metrics-server/
-helm repo update
-helm install metrics-server metrics-server/metrics-server \
+$bin_path/helm repo add metrics-server https://kubernetes-sigs.github.io/metrics-server/
+$bin_path/helm repo update
+$bin_path/helm install metrics-server metrics-server/metrics-server \
     --create-namespace \
     --namespace=kube-system \
     --set hostNetwork.enabled=true \
