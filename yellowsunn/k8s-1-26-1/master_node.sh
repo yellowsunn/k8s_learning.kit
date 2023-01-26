@@ -29,6 +29,8 @@ kubectl create secret generic -n metallb-system memberlist --from-literal=secret
 curl -0L https://get.helm.sh/helm-v3.11.0-linux-amd64.tar.gz > helm-v3.11.0-linux-amd64.tar.gz
 tar xvfz helm-v3.11.0-linux-amd64.tar.gz
 mv linux-amd64/helm $bin_path/.
+rm -f helm-v3.11.0-linux-amd64.tar.gz
+rm -rf linux-amd64/
 
 # install metrics-server:3.8.3 by helm
 $bin_path/helm repo add metrics-server https://kubernetes-sigs.github.io/metrics-server/
